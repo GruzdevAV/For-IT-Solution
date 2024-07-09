@@ -9,23 +9,22 @@
 	<body>
 	<form method="post" action="video_maker">
     	{% csrf_token %}
-    	<p>Текст:&nbsp;<input name=text title="Введите текст" type="text" value="{{text}}"/></p>
-    	<!--
-    	<p>Название файла:&nbsp;<input name=filename title="Введите название файла" type="text" value="{{filename}}"/></p>
-        -->
+    	<p>Текст:&nbsp;<input pattern=".{1,125}" required name=text title="Введите текст" type="text" value="{{text}}"/></p>
+    	<p>Длительность в секундах:&nbsp;<input name=sec required title="Введите число" min=1 type="number" value="{{sec}}"/></p>
         <p>Цвет фона:&nbsp;
         <select name=bgClr>
         {% for color in colors %}
         <option value="{{color.code}}" {%if color.code == bgClr%}selected{%endif%}>{{color.name}}</option>
         {% endfor %}
         </select></p>
-        
         <p>Цвет текста:&nbsp;
         <select name=txtClr>
         {% for color in colors %}
         <option value="{{color.code}}" {%if color.code == txtClr%}selected{%endif%}>{{color.name}}</option>
         {% endfor %}
         </select></p>
+        <p>Курсив:&nbsp;<input type=checkbox {%if italic%}checked{%endif%} name=checkboxes value="italic"/></p>
+        <p>Полужирный:&nbsp;<input type=checkbox {%if bold%}checked{%endif%} name=checkboxes value="bold"/></p>
         <p><input title="Сделать видео" type="submit" value="Сделать видео"/></p>
     </form>
     {% if video is not None %}

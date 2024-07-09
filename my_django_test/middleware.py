@@ -5,9 +5,8 @@ from django.core.handlers.wsgi import WSGIRequest
 
 logger = logging.getLogger('name_of_my_logger')
 
-# connection = sqlite3.connect("db.sqlite3")
-# cursor = connection.cursor()
 sql = "INSERT INTO requests (date_time, headers, body) VALUES (?,?,?)"
+
 def logging_middleware(get_response):
     # One-time configuration and initialization.
     def middleware(request: WSGIRequest):
@@ -15,7 +14,6 @@ def logging_middleware(get_response):
         response = get_response(request)
         print(request.headers)
         print(request.headers.items())
-        # insert_data = (time.time_ns(), request.path, request.method, request.body)
         insert_data = (time.time_ns(), str(request.headers), request.body)
         with sqlite3.connect("db.sqlite3") as con:
             cursor = con.cursor()

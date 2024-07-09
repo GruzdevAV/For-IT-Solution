@@ -32,27 +32,37 @@ colors = {
 class VideoMaker:
     # Ширина символа моноширинного шрифта с кегелем 82 примерно соответствует
     # 50 пикселям (половине ширины картинки)
-    font = ImageFont.truetype('cour.ttf',82)
     fourcc = cv2.VideoWriter_fourcc(*'mp4v')
-    
+    @classmethod
+    def getfont(cls,italic, bold):
+        match italic, bold:
+            case True, True:
+                return 'courbi.ttf'
+            case False, True:
+                return 'courbd.ttf'
+            case True, False:
+                return 'couri.ttf'
+            case False, False:
+                return 'cour.ttf'
     # https://stackoverflow.com/questions/16373425/add-text-on-image-using-pil
     @classmethod
-    def makeImageWithText(cls, text, txtClr, bgClr, filename):
+    def makeImageWithText(cls, text, txtClr, bgClr, italic, bold):
       # Чтобы текст появлялся и исчезал не резко, а уйдя в сторону
+      font = ImageFont.truetype(cls.getfont(italic,bold),82)
       text = f'  {text}  '
       if type(bgClr) is str: bgClr = ImageColor.getrgb(bgClr)
       if type(txtClr) is str: txtClr = ImageColor.getrgb(txtClr)
       with Image.new('RGB',(50 * len(text),100),bgClr) as img:
         draw = ImageDraw.Draw(img)
-        draw.text((0,0),text,txtClr,font=cls.font)
-        img.save(filename+'.png')
+        draw.text((0,0),text,txtClr,font=font)
+        # img.save(filename+'.png')
         return img
     
     # https://stackoverflow.com/questions/44947505/how-to-make-a-movie-out-of-images-in-python
     @classmethod
-    def makeVideo(cls, img: Image):
+    def makeVideo(cls, img: Image, seconds: int = 3):
       frames = img.size[0]-99
-      video = cv2.VideoWriter("temp.mp4",cls.fourcc,frames//3,(100,100))
+      video = cv2.VideoWriter("temp.mp4",cls.fourcc,frames/seconds,(100,100))
       for i in range(frames):
         # Для записи кадра видео нужно, чтобы этот кадр был, например,
         # в формате np.ndarray
@@ -61,7 +71,9 @@ class VideoMaker:
         frame = np.array(img.crop((i,0,100+i,100)))[:, :, ::-1]
         video.write(frame)
       video.release()
-      return cls.play_video()
+      video_html = cls.play_video()
+      os.remove("temp.mp4")
+      return video_html
     
     # https://stackoverflow.com/questions/57377185/how-play-mp4-video-in-google-colab
     # Input video path
@@ -70,11 +82,9 @@ class VideoMaker:
       # Compressed video path
       compressed_path = os.getcwd()+"\\compressed.mp4"
       os.system(f'ffmpeg -i "temp.mp4" -vcodec libx264 "{compressed_path}"')
-    
+
       # Show video
       with open(compressed_path,'rb') as mp4:
         data_url = "data:video/mp4;base64," + b64encode(mp4.read()).decode()
       os.remove(compressed_path)
-      os.remove("temp.mp4")
-      os.remove("temp.png")
       return data_url

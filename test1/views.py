@@ -8,27 +8,30 @@ def index(request):
 
 def video_maker(request: WSGIRequest, *args):
     
-    print(args)
     clrs = sorted(colors, key=lambda clr: clr.name)
     context = {'colors': clrs}
     
     if request.method == "POST":
         text = request.POST.get("text")
         bgClr = request.POST.get("bgClr")
+        checkboxes = request.POST.getlist("checkboxes")
+        italic = 'italic' in checkboxes
+        bold = 'bold' in checkboxes
         txtClr = request.POST.get("txtClr")
-        # filename = request.POST.get("filename")
-        # if len(filename)==0: filename = "file"
-        image = VideoMaker.makeImageWithText(text, txtClr, bgClr, "temp")
-        video = VideoMaker.makeVideo(image)
-        context['video'] = video
+        sec = int(request.POST.get("sec"))
+        image = VideoMaker.makeImageWithText(text, txtClr, bgClr, italic, bold)
+        video = VideoMaker.makeVideo(image, sec)
         context['text'] = text
         context['bgClr'] = bgClr
+        context['sec'] = sec
         context['txtClr'] = txtClr
-        # context['filename'] = filename
+        context['italic'] = italic
+        context['bold'] = bold
+        context['video'] = video
     else:
-        context['text'] = ""
-        context['bgClr'] = ""
-        context['txtClr'] = ""
-        # context['filename'] = ""
+        context['text'] = "Text"
+        context['bgClr'] = "white"
+        context['sec'] = 3
+        context['txtClr'] = "black"
     test = render(request, 'video_maker.html' , context)
     return test
