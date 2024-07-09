@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html>
+
+	<head>
+	<meta charset="utf-8"/>
+	<title>Video Maker</title>
+	</head>
+	
+	<body>
+	<form method="post" action="video_maker">
+    	{% csrf_token %}
+    	<p>Текст:&nbsp;<input name=text title="Введите текст" type="text" value="{{text}}"/></p>
+    	<!--
+    	<p>Название файла:&nbsp;<input name=filename title="Введите название файла" type="text" value="{{filename}}"/></p>
+        -->
+        <p>Цвет фона:&nbsp;
+        <select name=bgClr>
+        {% for color in colors %}
+        <option value="{{color.code}}" {%if color.code == bgClr%}selected{%endif%}>{{color.name}}</option>
+        {% endfor %}
+        </select></p>
+        
+        <p>Цвет текста:&nbsp;
+        <select name=txtClr>
+        {% for color in colors %}
+        <option value="{{color.code}}" {%if color.code == txtClr%}selected{%endif%}>{{color.name}}</option>
+        {% endfor %}
+        </select></p>
+        <p><input title="Сделать видео" type="submit" value="Сделать видео"/></p>
+    </form>
+    {% if video is not None %}
+    <video width=500 controls><source src="{{video}}" type="video/mp4"></video>
+    {% endif %}
+	</body>
+</html>
