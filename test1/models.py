@@ -3,6 +3,7 @@ from django.db import models
 import cv2, numpy as np, os
 from PIL import Image, ImageFont, ImageDraw, ImageColor
 from base64 import b64encode
+from ffmpeg.ffmpeg import FFmpeg
 
 class Color:
     
@@ -80,8 +81,10 @@ class VideoMaker:
     @classmethod
     def play_video(cls):
       # Compressed video path
-      compressed_path = os.getcwd()+"\\compressed.mp4"
-      os.system(f'ffmpeg -i "temp.mp4" -vcodec libx264 "{compressed_path}"')
+      # compressed_path = os.getcwd()+"\\compressed.mp4"
+      compressed_path = "compressed.mp4"
+      FFmpeg().input("temp.mp4").output(compressed_path, vcodec="libx264").execute()
+      # os.system(f'ffmpeg -i "temp.mp4" -vcodec libx264 "{compressed_path}"')
 
       # Show video
       with open(compressed_path,'rb') as mp4:
