@@ -4,6 +4,7 @@ import cv2, numpy as np, os
 from PIL import Image, ImageFont, ImageDraw, ImageColor
 from base64 import b64encode
 from ffmpeg.ffmpeg import FFmpeg
+from time import sleep
 
 class Color:
     
@@ -63,8 +64,10 @@ class VideoMaker:
     @classmethod
     def makeVideo(cls, img: Image, seconds: int = 3):
       frames = img.size[0]-99
-      video = cv2.VideoWriter("temp.mp4",cls.fourcc,frames/seconds,(100,100))
-      for i in range(frames):
+      print(f"test {frames=} {seconds=} {frames/seconds=}")
+      # print("test",type(cls.fourcc),cls.fourcc)
+      video = cv2.VideoWriter("/content/temp.mp4",cls.fourcc,frames/seconds/3,(100,100))
+      for i in range(0,frames,3):
         # Для записи кадра видео нужно, чтобы этот кадр был, например,
         # в формате np.ndarray
         # https://stackoverflow.com/questions/384759/how-do-i-convert-a-pil-image-into-a-numpy-array
@@ -72,8 +75,9 @@ class VideoMaker:
         frame = np.array(img.crop((i,0,100+i,100)))[:, :, ::-1]
         video.write(frame)
       video.release()
+      # sleep(5)
       video_html = cls.play_video()
-      os.remove("temp.mp4")
+      # os.remove("temp.mp4")
       return video_html
     
     # https://stackoverflow.com/questions/57377185/how-play-mp4-video-in-google-colab
@@ -82,10 +86,9 @@ class VideoMaker:
     def play_video(cls):
       # Compressed video path
       # compressed_path = os.getcwd()+"\\compressed.mp4"
-      compressed_path = "compressed.mp4"
-      FFmpeg().input("temp.mp4").output(compressed_path, vcodec="libx264").execute()
+      compressed_path = "/content/compressed.mp4"
+      FFmpeg().input("/content/temp.mp4").output(compressed_path, vcodec="libx264").execute()
       # os.system(f'ffmpeg -i "temp.mp4" -vcodec libx264 "{compressed_path}"')
-
       # Show video
       with open(compressed_path,'rb') as mp4:
         data_url = "data:video/mp4;base64," + b64encode(mp4.read()).decode()
