@@ -18,5 +18,5 @@ Including another URLconf
 from django.urls import include, re_path
 
 urlpatterns = [
-    re_path(r'^(test1/)?', include('test1.urls')),
+    re_path(r'^(gettext/)?', include('test1.urls')),
 ]
